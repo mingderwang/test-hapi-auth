@@ -1,34 +1,53 @@
 'use strict'
-const hapi = require('hapi');
-const authKeycloak = require('hapi-auth-keycloak');
-const routes = require('./routes');
+const Hapi = require('hapi')
 
-const server = hapi.server({ port: 3000 });
+// create new server instance
+const server = new Hapi.Server()
 
-const options = {
-  realmUrl: 'https://secure.eth.cards/auth/realms/testme',
-  clientId: 'foobar',
-  minTimeBetweenJwksRequests: 15,
-  cache: true,
-  userInfo: ['name', 'email']
+const validate = async (request, username, password, h) => {
+
+    if (username === 'help') {
+        return { response: h.redirect('https://hapijs.com/help') };     // custom response
+    }
+
+    const user = users[username];
+    if (!user) {
+        return { credentials: null, isValid: false };
+    }
+
+    const isValid = await Bcrypt.compare(password, user.password);
+    const credentials = { id: user.id, name: user.name };
+
+    return { isValid, credentials };
 };
 
-process.on('SIGINT', async () => {
-  try { 
-    await server.stop();
-  } catch (err) {
-    process.exit(err ? 1 : 0);
-  }
-});
+async function liftOff() {  
+  await server.register([
+    {
+      plugin: require('hapi-auth-basic')
+    }
+  ])
 
-(async () => {
+
+    server.auth.strategy('simple', 'basic', { validate });
+    server.auth.default('simple');
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, h) {
+
+            return 'welcome';
+        }
+   });
+
   try {
-    await server.register({ plugin: authKeycloak, options });
-    server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
-    await server.register({ plugin: routes });
-    await server.start();
-    console.log('Server started successfully');
+    await server.start()
+    console.log('info', 'Server running at: ' + server.info.uri)
   } catch (err) {
-    console.error(err);
+    console.error(err)
+    process.exit(1)
   }
-})();
+}
+
+liftOff()  

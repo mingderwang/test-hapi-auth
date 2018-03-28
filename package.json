@@ -8,6 +8,8 @@
   },
   "dependencies": {
     "hapi": "^17.2.3",
+    "hapi-auth-basic": "^5.0.0",
+    "hapi-auth-cookie": "^8.1.0",
     "hapi-auth-keycloak": "^3.2.1"
   }
 }

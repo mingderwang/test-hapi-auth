@@ -195,6 +195,22 @@ got@^8.0.3:
     url-parse-lax "^3.0.0"
     url-to-options "^1.0.1"
 
+hapi-auth-basic@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/hapi-auth-basic/-/hapi-auth-basic-5.0.0.tgz#0438b00225e4f7baccd7f29e04b4fc5037c012b0"
+  dependencies:
+    boom "7.x.x"
+    hoek "5.x.x"
+
+hapi-auth-cookie@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/hapi-auth-cookie/-/hapi-auth-cookie-8.1.0.tgz#83d46a1d56030e6ee6eb682204f42c0cdf9d4331"
+  dependencies:
+    boom "7.x.x"
+    bounce "1.x.x"
+    hoek "5.x.x"
+    joi "13.x.x"
+
 hapi-auth-keycloak@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/hapi-auth-keycloak/-/hapi-auth-keycloak-3.2.1.tgz#dea77f4b2451faf238f7733a752e7c52b678af2c"
