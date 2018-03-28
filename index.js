@@ -29,7 +29,7 @@ async function liftOff() {
         auth: {
           strategies: ['keycloak-jwt'],
           access: {
-             scope: ['test']
+            scope: ['realm:admin', 'editor', 'other-resource:creator', 'scope:foo.READ']
           }
         },
           handler: function (request, h) {
