@@ -1,45 +1,43 @@
 'use strict'
 const Hapi = require('hapi')
+const authKeycloak = require('hapi-auth-keycloak');
+
+const port        = process.env.PORT || 8000; // allow port to be set
 
 // create new server instance
-const server = new Hapi.Server()
-
-const validate = async (request, username, password, h) => {
-
-    if (username === 'help') {
-        return { response: h.redirect('https://hapijs.com/help') };     // custom response
-    }
-
-    const user = users[username];
-    if (!user) {
-        return { credentials: null, isValid: false };
-    }
-
-    const isValid = await Bcrypt.compare(password, user.password);
-    const credentials = { id: user.id, name: user.name };
-
-    return { isValid, credentials };
-};
+const server = new Hapi.Server( {port: port} )
+const options =  {
+    realmUrl: 'http://192.168.64.19:8080/auth/realms/nodejs-example',
+    clientId: 'nodejs-connect2',
+    minTimeBetweenJwksRequests: 15,
+    cache: true,
+    userInfo: ['name', 'email']
+  }
 
 async function liftOff() {  
-  await server.register([
+  await server.register(
+    { plugin: authKeycloak, options }
+  )
+    server.auth.strategy('keycloak-jwt', 'keycloak-jwt');
+    server.auth.default('keycloak-jwt');
+
+    server.route(
     {
-      plugin: require('hapi-auth-basic')
-    }
-  ])
-
-
-    server.auth.strategy('simple', 'basic', { validate });
-    server.auth.default('simple');
-
-    server.route({
-        method: 'GET',
-        path: '/',
-        handler: function (request, h) {
-
-            return 'welcome';
+      method: 'GET',
+      path: '/',
+      config: {
+        auth: {
+          strategies: ['keycloak-jwt'],
+          access: {
+             scope: ['test']
+          }
+        },
+          handler: function (request, h) {
+   	    return h.response(request.auth.credentials);
+          }
         }
-   });
+    }
+  );
 
   try {
     await server.start()
